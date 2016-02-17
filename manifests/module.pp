@@ -4,7 +4,7 @@
 #
 class percona::module {
 
-  $id = 'vstone-puppet-percona'
+  $id = 'axier-puppet-percona'
   $version = '1.3.2'
 
 }

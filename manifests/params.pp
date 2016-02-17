@@ -78,7 +78,7 @@ class percona::params (
   $socket            = '/var/lib/mysql/mysql.sock',
   $datadir           = '/var/lib/mysql',
   $targetdir         = '/data/backups/mysql/',
-  $errorlog          = '/var/log/mysqld.log',
+  $error_log         = '/var/log/mysqld.log',
 
 
   $pkg_client        = undef,
@@ -88,12 +88,6 @@ class percona::params (
   $pkg_version       = undef,
 
   $mgmt_cnf          = undef,
-
-  $default_configuration  = {
-    '5.5'    => {},
-    'global' => {},
-  }
-) {
 
   case $::operatingsystem {
     /(?i:debian|ubuntu)/: {
@@ -118,6 +112,49 @@ class percona::params (
     default: {
       fail('Operating system not supported yet.')
     }
+  }
+
+  $default_config  = {
+    'client'          => {
+      'port'          => '3306',
+      'socket'        => $percona::params::socket,
+    },
+    'mysqld_safe'        => {
+      'nice'             => '0',
+      'log-error'        => $percona::params::log_error,
+      'socket'           => $percona::params::socket,
+    },
+    'mysqld'                  => {
+      'basedir'               => $percona::params::basedir,
+      'bind-address'          => $::fqdn,
+      'datadir'               => $percona::params::datadir,
+      'expire_logs_days'      => '10',
+      'key_buffer_size'       => '16M',
+      'log-error'             => $percona::params::log_error,
+      'max_allowed_packet'    => '16M',
+      'max_binlog_size'       => '100M',
+      'max_connections'       => '151',
+      'myisam_recover'        => 'BACKUP',
+      'pid-file'              => $percona::params::pidfile,
+      'port'                  => '3306',
+      'query_cache_limit'     => '1M',
+      'query_cache_size'      => '16M',
+      'skip-external-locking' => true,
+      'socket'                => $percona::params::socket,
+      'ssl-disable'           => false,
+      'thread_cache_size'     => '8',
+      'thread_stack'          => '256K',
+      'tmpdir'                => $percona::params::tmpdir,
+      'user'                  => 'mysql',
+    },
+    'mysqldump'             => {
+      'max_allowed_packet'  => '16M',
+      'quick'               => true,
+      'quote-names'         => true,
+    },
+    'isamchk'      => {
+      'key_buffer_size' => '16M',
+    },
   }
 
   $_config_file = $config_file ? {

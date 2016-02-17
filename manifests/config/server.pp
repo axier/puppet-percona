@@ -20,8 +20,8 @@ class percona::config::server {
   $daemon_user      = $::percona::daemon_user
   $logdir           = $::percona::logdir
   $logdir_group     = $::percona::logdir_group
-  $server           = $::percona::server
-  $service_name     = $::percona::service_name
+  $service_enable   = $::percona::service_enable
+  $service_manage   = $::percona::service_manage
   $service_restart  = $::percona::service_restart
   $template         = $::percona::template
   $version          = $::percona::percona_version
@@ -41,11 +41,6 @@ class percona::config::server {
       notify => Service[$service_name],
     }
   }
-
-  # Workaround for assigning an empty hash. Puppet doesn't know how to
-  # handle {} very well in certain places.
-  $empty_hash = {}
-
 
   # Get the hash that is global (all versions).
   if $default_configuration['global'] {
