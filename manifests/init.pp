@@ -73,11 +73,12 @@ class percona (
   $config_user      = $percona::params::config_user,
   $config_group     = $percona::params::config_group,
 
-  $config_content   = $percona::params::config_content,
-  $config_template  = $percona::params::config_template,
-  $config_skip      = $percona::params::config_skip,
-  $config_replace   = $percona::params::config_replace,
-  $config_include_dir = $::percona::params::config_include_dir,
+  $config_content     = $percona::params::config_content,
+  $config_template    = $percona::params::config_template,
+  $config_skip        = $percona::params::config_skip,
+  $config_replace     = $percona::params::config_replace,
+  $config_include_dir = $percona::params::config_include_dir,
+  $manage_config_file = $percona::params::manage_config_file,
 
   $service_enable   = $percona::params::service_enable,
   $service_ensure   = $percona::params::service_ensure,
@@ -170,7 +171,7 @@ class percona (
 
   include percona::preinstall
   include percona::install
-  #include percona::config
+  include percona::config
   #include percona::service
 
   Class['percona::preinstall'] ->

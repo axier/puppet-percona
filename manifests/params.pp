@@ -63,6 +63,7 @@ class percona::params (
   $config_replace    = true,
   $config_include_dir = undef,
   $config_file       = undef,
+  $manage_config_file = true,
 
   $service_enable    = true,
   $service_ensure    = 'running',
@@ -93,22 +94,15 @@ class percona::params (
 
   case $::operatingsystem {
     /(?i:debian|ubuntu)/: {
-      $config_dir  = '/etc/mysql'
-      $default_config_file = '/etc/mysql/my.cnf'
-      $template    = $config_template ? {
-        undef   => 'percona/my.cnf.Debian.erb',
-        default => $config_template,
-      }
+      $config_dir                 = '/etc/mysql'
+      $default_config_file        = "${config_dir}/my.cnf"
       $config_include_dir_default = "${config_dir}/conf.d"
     }
 
     /(?i:redhat|centos)/: {
-      $default_config_file = '/etc/my.cnf'
-      $template    = $config_template ? {
-        undef   => 'percona/my.cnf.erb',
-        default => $config_template,
-      }
-      $config_include_dir_default = undef
+      $config_dir                 = '/etc'
+      $default_config_file        = "${config_dir}/my.cnf"
+      $config_include_dir_default = "${config_dir}/my.cnf.d"
     }
 
     default: {

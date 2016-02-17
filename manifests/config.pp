@@ -3,7 +3,7 @@
 #
 class percona::config {
 
-  $package        = $::percona::package
+  $package = $::percona::package
 
   case $package {
     'cluster': {

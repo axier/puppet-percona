@@ -5,11 +5,10 @@ class percona::config::cluster {
   $config_dir_mode    = $::percona::config_dir_mode
   $config_file        = $::percona::config_file
   $config_file_mode   = $::percona::config_file_mode
-  $config_group       = $::percona::config_group
   $purge_includedir   = $::percona::purge_includedir
   $config_includedir  = $::percona::config_includedir
   $config_user        = $::percona::config_user
-  $config_group       = $::percona::paramas::
+  $config_group       = $::percona::config_group
   $config_replace     = $::percona::config_replace
   $config_skip        = $::percona::config_skip
 
@@ -36,11 +35,11 @@ class percona::config::cluster {
       Class['percona::install'],
     ],
   }
-  if $service_restart {
+  /*if $service_restart {
     File {
       notify => Service[$service_name],
     }
-  }
+  }*/
 
   if $config_includedir and $config_includedir != '' {
     file { $config_includedir:
@@ -52,17 +51,10 @@ class percona::config::cluster {
 
   if $::percona::manage_config_file {
     file { $config_file:
-      path                    => $::percona::parameters::config_file
+      path                    => $::percona::params::config_file,
       ensure                  => 'present',
-      content                 => template('percona/${::percona::package}/my.cnf.erb'),
+      content                 => template("percona/${::percona::package}/my.cnf.erb"),
       selinux_ignore_defaults => true,
-    }
-  }
-
-
-  if $service_restart {
-    File {
-      notify => Service[$service_name],
     }
   }
 }
