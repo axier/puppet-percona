@@ -12,7 +12,7 @@ class percona::install {
       $pkg_install = "percona-${package_prefix}-${pkg_version}"
     }
     /(?i:redhat|centos)/: {
-      $pkg_install = "percona-${package_prefix}-${pkg_version}"
+      $pkg_install = "Percona-${package_prefix}-${pkg_version}"
     }
 
     default: {
