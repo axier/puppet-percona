@@ -3,9 +3,9 @@
 #
 class percona::install {
   $package_prefix   = $::percona::package_prefix
-  $percona_version  = $::percona::percona_version
+  $package_version  = $::percona::package_version
 
-  $pkg_version = regsubst($percona_version, '\.', '', 'G')
+  $pkg_version = regsubst($package_version, '\.', '', 'G')
 
   case $::operatingsystem {
     /(?i:debian|ubuntu)/: {
@@ -27,7 +27,7 @@ class percona::install {
   }
 
   package { $pkg_install:
-     ensure  => 'present',
+     ensure  => 'installed',
   }
 
 }
