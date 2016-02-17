@@ -65,23 +65,27 @@
 #
 class percona (
   $percona_version  = $percona::params::percona_version,
-  $client           = $percona::params::client,
-  $config_content   = $percona::params::config_content,
+  $manage_repo      = $percona::params::manage_repo,
+  $package          = $percona::params::package,
+
   $config_dir_mode  = $percona::params::config_dir_mode,
   $config_file_mode = $percona::params::config_file_mode,
   $config_user      = $percona::params::config_user,
   $config_group     = $percona::params::config_group,
+
+  $config_content   = $percona::params::config_content,
   $config_template  = $percona::params::config_template,
   $config_skip      = $percona::params::config_skip,
   $config_replace   = $percona::params::config_replace,
   $config_include_dir = $::percona::params::config_include_dir,
-  $server           = $percona::params::server,
+
   $service_enable   = $percona::params::service_enable,
   $service_ensure   = $percona::params::service_ensure,
   $service_name     = $percona::params::service_name,
   $service_restart  = $percona::params::service_restart,
   $daemon_group     = $percona::params::daemon_group,
   $daemon_user      = $percona::params::daemon_user,
+  $pidfile          = $percona::params::pidfile,
 
   $tmpdir           = $percona::params::tmpdir,
   $logdir           = $percona::params::logdir,
@@ -90,8 +94,7 @@ class percona (
   $datadir          = $percona::params::datadir,
   $targetdir        = $percona::params::targetdir,
   $errorlog         = $percona::params::errorlog,
-  $pidfile          = $percona::params::pidfile,
-  $manage_repo      = $percona::params::manage_repo,
+
 
   $pkg_client       = $percona::params::pkg_client,
   $pkg_common       = $percona::params::pkg_common,
@@ -121,6 +124,27 @@ class percona (
 
   $sanitized_servername = regsubst($::percona::servername,'\.','-','G')
 
+  case $package {
+
+    'cluster': {
+      $package_prefix = 'XtraDB-Cluster'
+    }
+    'server': {
+      $package_prefix = 'Server-server'
+    }
+    'cluster_client': {
+      $package_prefix = 'XtraDB-Cluster-client'
+    }
+    'server_client': {
+      $package_prefix = 'Server-client'
+    }
+    default: {
+      fail('Wrong package!!! Wou must choose one of the follow packages: cluster, server, cluster_client, cluster_server.')
+    }
+  }
+
+
+
 
   ## Translate settings in params in a hash.
   $params = {
@@ -146,13 +170,14 @@ class percona (
 
   include percona::preinstall
   include percona::install
-  include percona::config
-  include percona::service
+  #include percona::config
+  #include percona::service
 
   Class['percona::preinstall'] ->
-  Class['percona::install'] ->
-  Class['percona::config'] ->
-  Class['percona::service']
+  Class['percona::install']
+  #Class['percona::install'] ->
+  #Class['percona::config'] ->
+  #Class['percona::service']
 
 }
 

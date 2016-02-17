@@ -47,25 +47,31 @@
 # TODO: Document parameters
 #
 class percona::params (
-  $percona_version   = '5.1',
-  $client            = true,
-  $config_content    = undef,
+  $package_version   = '5.5',
+  $manage_repo       = true,
+  $package           = 'cluster',
+
   $config_dir_mode   = '0750',
   $config_file_mode  = '0640',
   $config_user       = 'root',
   $config_group      = 'root',
+
+  $config_content    = undef,
+
   $config_template   = undef,
   $config_skip       = false,
   $config_replace    = true,
   $config_include_dir = undef,
   $config_file       = undef,
-  $server            = false,
+
   $service_enable    = true,
   $service_ensure    = 'running',
   $service_name      = 'mysql',
   $service_restart   = true,
   $daemon_group      = 'mysql',
   $daemon_user       = 'mysql',
+  $pidfile           = '/var/run/mysqld/mysqld.pid',
+
   $tmpdir            = undef,
   $logdir            = '/var/log/percona',
   $logdir_group      = 'root',
@@ -73,8 +79,7 @@ class percona::params (
   $datadir           = '/var/lib/mysql',
   $targetdir         = '/data/backups/mysql/',
   $errorlog          = '/var/log/mysqld.log',
-  $pidfile           = '/var/run/mysqld/mysqld.pid',
-  $manage_repo       = false,
+
 
   $pkg_client        = undef,
   $pkg_server        = undef,
@@ -86,7 +91,6 @@ class percona::params (
 
   $default_configuration  = {
     '5.5'    => {},
-    '5.1'    => {},
     'global' => {},
   }
 ) {
