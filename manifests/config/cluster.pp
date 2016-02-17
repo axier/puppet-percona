@@ -52,9 +52,9 @@ class percona::config::cluster {
 
   if $::percona::manage_config_file {
     file { $config_file:
-      path    => $::percona::parameters::config_file
-      ensure  => 'present',
-      content => template('percona/${::percona::package}/my.cnf.erb'),
+      path                    => $::percona::parameters::config_file
+      ensure                  => 'present',
+      content                 => template('percona/${::percona::package}/my.cnf.erb'),
       selinux_ignore_defaults => true,
     }
   }

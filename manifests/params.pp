@@ -46,7 +46,7 @@
 #
 # TODO: Document parameters
 #
-class percona::params (
+class percona::params {
   $package_version   = '5.5',
   $manage_repo       = true,
   $package           = 'cluster',

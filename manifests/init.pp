@@ -174,9 +174,8 @@ class percona (
   #include percona::service
 
   Class['percona::preinstall'] ->
-  Class['percona::install']
-  #Class['percona::install'] ->
-  #Class['percona::config'] ->
+  Class['percona::install'] ->
+  Class['percona::config']
   #Class['percona::service']
 
 }
