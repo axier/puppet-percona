@@ -9,43 +9,33 @@ module Puppet::Parser::Functions
 EODOC
   ) do |args|
 
-    Puppet::Parser::Functions.autoloader.load(:percona_hash_print_section) unless \
-      Puppet::Parser::Functions.autoloader.loaded?(:percona_hash_print_section)
+    raise(Puppet::ParseError, "percona_hash_print(): Required a hash to work") unless args[0].is_a?(Hash)
+    hash = args[0]
 
-    args = [args] unless args.is_a?(Array)
-    unless [1,2].include?(args.length)
-      raise(Puppet::ParseError, "percona_hash_print(): wrong number of arguments (got #{args.length}, expected 1 or 2)")
-    end
-
-    hash = args.shift
-    sections = args.shift
-    sections = [sections] if sections.is_a?(String)
-    if sections == nil
-      ## Make sure the function we want to use is loaded.
-      Puppet::Parser::Functions.autoloader.load(:percona_hash_sections) unless \
-        Puppet::Parser::Functions.autoloader.loaded?(:percona_hash_sections)
-      # Get all them sections from the hash.
-      sections = function_percona_hash_sections([hash])
-    end
-
-    unless hash.is_a?(Hash)
-      raise(Puppet::ParseError, 'percona_hash_print(): first argument should be a hash.')
-    end
-    unless sections.is_a?(Array)
-      raise(Puppet::ParseError, 'percona_hash_print(): second argument should be absent, a string or an array.')
-    end
 
     results = []
-    sections.sort.each do |sec|
+    hash.sort.map do |k,v|
+      if k == ''
+        raise(Puppet::ParseError, "percona_hash_print(): Section could not be empty")
+      end
       tmp = []
-      tmp << "[#{sec}]"
-      tmp << function_percona_hash_print_section([hash,sec])
+      tmp << "[#{k}]"
+      if v.is_a?(Hash)
+        v.sort.map do |ki,vi|
+          if vi == :undef
+            tmp << "#{ki}"
+          elsif vi.is_a?(Array)
+            vii = vi.join(",")
+            tmp << "#{ki} = #{vii}"
+          else
+            tmp << "#{ki} = #{vi}"
+          end
+        end
+      end
       tmp << ""
       tmp.flatten!
       results << tmp.join("\n")
     end
-
     results.join("\n")
   end
-
 end

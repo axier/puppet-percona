@@ -79,30 +79,16 @@ module Puppet::Parser::Functions
 EODOC
   ) do |args|
 
-    args = [args] unless args.is_a?(Array)
-    args.flatten!
+    if args.length < 2
+      raise Puppet::ParseError, ("percona_hash_merge(): wrong number of arguments (#{args.length}; must be at least 2)")
+    end
 
-    sanitized = []
-    # Sanitize ALL the hashes! Add/merge with our keyset_default.
+    result = Hash.new
     args.each do |hash|
       # Yeah, we only handle hashes well.
       raise(Puppet::ParseError, 'percona_hash_merge(): Arguments should be hashes') unless hash.is_a?(Hash)
-      sanitized << function_percona_hash_sanitize([hash])
+      result.merge( hash )
     end
-
-    # The first hash in the array (first argument) is the most correct.
-    result_hash = sanitized.shift
-
-    ## Merge them here ;)
-    sanitized.each do |hash|
-      hash.each do |k,v|
-        if ! result_hash.include?(k)
-          result_hash[k] = v
-        end
-      end
-    end
-
-    result_hash
-
+    return( result)
   end
 end

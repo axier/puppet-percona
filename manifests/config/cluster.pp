@@ -20,12 +20,12 @@ class percona::config::cluster {
   $template           = $::percona::template
   $version            = $::percona::percona_version
 
-  $default_config     = $::percona::params::default_options
+  $default_config     = $::percona::params::default_config
   $override_options   = $::percona::override_options
   $manage_config_file = $::percona::manage_config_file
 
 
-  $options = mysql_deepmerge($default_config, $override_options)
+  $options = percona_hash_merge($default_config, $override_options)
 
   File {
     owner   => $config_user,
@@ -50,8 +50,8 @@ class percona::config::cluster {
   }
 
   if $::percona::manage_config_file {
-    file { $config_file:
-      path                    => $::percona::params::config_file,
+    file { $_config_file:
+      path                    => $::percona::params::$_config_file,
       ensure                  => 'present',
       content                 => template("percona/${::percona::package}/my.cnf.erb"),
       selinux_ignore_defaults => true,
