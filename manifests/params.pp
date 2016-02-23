@@ -47,7 +47,7 @@
 # TODO: Document parameters
 #
 class percona::params (
-  $package_version   = '5.5',
+  $package_version   = '5.6',
   $manage_repo       = true,
   $package           = 'cluster',
 
@@ -72,14 +72,25 @@ class percona::params (
   $daemon_group      = 'mysql',
   $daemon_user       = 'mysql',
   $pidfile           = '/var/run/mysqld/mysqld.pid',
+  $basedir           = '/usr',
 
-  $tmpdir            = undef,
+  $tmpdir            = '/tmp',
   $logdir            = '/var/log/percona',
   $logdir_group      = 'root',
   $socket            = '/var/lib/mysql/mysql.sock',
   $datadir           = '/var/lib/mysql',
   $targetdir         = '/data/backups/mysql/',
   $error_log         = '/var/log/mysqld.log',
+
+  $mysql_cluster_servers = 'ipadresses',
+  $wsrep_cluster_address = "gcomm://${mysql_cluster_servers}",
+  $wsrep_provider = $percona::params::percona_provider,
+  $wsrep_sst_receive_address = "${ipaddress}:4020",
+  $wsrep_sst_user = 'sstuser',
+  $wsrep_sst_password = 'sStus3r4020',
+  $wsrep_sst_method = 'xtrabackup',
+  $wsrep_cluster_name = 'custerPercona',
+  $wsrep_sst_donor = undef,
 
 
   $pkg_client        = undef,
@@ -111,45 +122,49 @@ class percona::params (
   }
 
   $default_config  = {
-    'client'          => {
-      'port'          => '3306',
-      'socket'        => $percona::params::socket,
+    'mysqld' => {
+      #'basedir'                        => $percona::params::basedir,
+      'bind-address'                    => $::fqdn,
+      'datadir'                         => $percona::params::datadir,
+      #'expire_logs_days'               => '10',
+      #'key_buffer_size'                => '16M',
+      #'log-error'                      => $percona::params::error_log,
+      #'max_allowed_packet'             => '16M',
+      #'max_binlog_size'                => '100M',
+      #'max_connections'                => '151',
+      #'myisam_recover'                 => 'BACKUP',
+      #'pid-file'                       => $percona::params::pidfile,
+      #'port'                           => '3306',
+      #'query_cache_limit'              => '1M',
+      #'query_cache_size'               => '16M',
+      #'skip-external-locking'          => true,
+      #'socket'                         => $percona::params::socket,
+      #'ssl-disable'                    => false,
+      #'thread_cache_size'              => '8',
+      #'thread_stack'                   => '256K',
+      #'tmpdir'                         => $percona::params::tmpdir,
+      'user'                           => 'mysql',
+      'wsrep_provider'                 => '/usr/lib64/libgalera_smm.so',
+      'wsrep_cluster_address'          => "gcomm://centos7-1.vagrant.local,centos7-2.vagrant.local,centos7-3.vagrant.local",
+      'binlog_format'                  => 'ROW',
+      'default_storage_engine'         => 'InnoDB',
+      'wsrep_node_address'             => $::fqdn,
+      'wsrep_sst_method'               => 'xtrabackup',
+      'wsrep_sst_auth'                 => "sstuser:s3cret",
+      'wsrep_cluster_name'             => 'custerPercona',
+      'innodb_buffer_pool_size'        => '128M',
+      'innodb_log_file_size'           => '256M',
+      'innodb_file_per_table'          => '1',
+      'innodb_autoinc_lock_mode'       => '2',
+      'innodb_locks_unsafe_for_binlog' => '1',
     },
-    'mysqld_safe'        => {
-      'nice'             => '0',
-      'log-error'        => $percona::params::log_error,
+    'mysqld_safe' => {
+      'log-error'        => $percona::params::error_log,
       'socket'           => $percona::params::socket,
     },
-    'mysqld'                  => {
-      'basedir'               => $percona::params::basedir,
-      'bind-address'          => $::fqdn,
-      'datadir'               => $percona::params::datadir,
-      'expire_logs_days'      => '10',
-      'key_buffer_size'       => '16M',
-      'log-error'             => $percona::params::log_error,
-      'max_allowed_packet'    => '16M',
-      'max_binlog_size'       => '100M',
-      'max_connections'       => '151',
-      'myisam_recover'        => 'BACKUP',
-      'pid-file'              => $percona::params::pidfile,
+    'client' => {
       'port'                  => '3306',
-      'query_cache_limit'     => '1M',
-      'query_cache_size'      => '16M',
-      'skip-external-locking' => true,
       'socket'                => $percona::params::socket,
-      'ssl-disable'           => false,
-      'thread_cache_size'     => '8',
-      'thread_stack'          => '256K',
-      'tmpdir'                => $percona::params::tmpdir,
-      'user'                  => 'mysql',
-    },
-    'mysqldump'             => {
-      'max_allowed_packet'  => '16M',
-      'quick'               => true,
-      'quote-names'         => true,
-    },
-    'isamchk'      => {
-      'key_buffer_size' => '16M',
     },
   }
 
@@ -157,5 +172,4 @@ class percona::params (
     undef   => $default_config_file,
     default => $config_file,
   }
-
 }

@@ -21,11 +21,11 @@ class percona::config::cluster {
   $version            = $::percona::percona_version
 
   $default_config     = $::percona::params::default_config
-  $override_options   = $::percona::override_options
+  $override_config    = $::percona::override_config
   $manage_config_file = $::percona::manage_config_file
 
 
-  $options = percona_hash_merge($default_config, $override_options)
+  $options = merge($default_config, $override_config)
 
   File {
     owner   => $config_user,
@@ -51,7 +51,7 @@ class percona::config::cluster {
 
   if $::percona::manage_config_file {
     file { $_config_file:
-      path                    => $::percona::params::$_config_file,
+      path                    => $::percona::params::_config_file,
       ensure                  => 'present',
       content                 => template("percona/${::percona::package}/my.cnf.erb"),
       selinux_ignore_defaults => true,
