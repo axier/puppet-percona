@@ -39,6 +39,11 @@ class percona::config::cluster {
           'wsrep_sst_auth'   => "${wsrep_sst_user}:${wsrep_sst_password}"
         },
       }
+      if $percona::master {
+        include percona::sst_auth
+
+        Class['percona::root_password'] -> Class['percona::sst_auth'] -> Anchor['percona::end']
+      }
     }
     default: {
       $sst_method_config = {
