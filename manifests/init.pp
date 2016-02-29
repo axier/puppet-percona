@@ -130,6 +130,44 @@ class percona (
     }
     'server': {
       $package_prefix = 'Server-server'
+      $default_config  = {
+        'mysqld' => {
+          'basedir'                        => $basedir,
+          'bind-address'                   => $bind_address,
+          'datadir'                        => $datadir,
+          'max_connections'                => $max_connections,
+          'pid-file'                       => $pidfile,
+          'port'                           => $port,
+          'socket'                         => $socket,
+          'tmpdir'                         => $tmpdir,
+          'user'                           => $mysql_user,
+          'binlog_format'                  => $binlog_format,
+          'default_storage_engine'         => $storage_engine,
+          'innodb_buffer_pool_size'        => $percona::params::innodb_buffer_pool_size,
+          'innodb_log_file_size'           => $percona::params::innodb_log_file_size,
+          'innodb_log_buffer_size'         => $percona::params::innodb_log_buffer_size,
+          'innodb_file_per_table'          => $innodb_file_per_table,
+          'innodb_autoinc_lock_mode'       => $innodb_autoinc_lock_mode,
+          'innodb_flush_log_at_trx_commit' => $innodb_flush_log_at_trx_commit,
+          'innodb_support_xa'              => $innodb_support_xa,
+          'innodb_doublewrite'             => $innodb_doublewrite,
+          'innodb_flush_method'            => $innodb_flush_method,
+          'query_cache_size'               => $query_cache_size,
+          'query_cache_type'               => $query_cache_type,
+          'sync_binlog'                    => $sync_binlog,
+          'log-bin'                        => $log_bin,
+          'symbolic_links'                 => $symbolic_links,
+        },
+        'mysqld_safe' => {
+          'log-error' => $error_log,
+          'socket'    => $socket,
+        },
+        'client' => {
+          'port'   => $port,
+          'socket' => $socket,
+        },
+      }
+      $service_name = $percona::params::service_name
     }
     'cluster_client': {
       $package_prefix = 'XtraDB-Cluster-client'

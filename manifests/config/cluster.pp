@@ -6,8 +6,6 @@ class percona::config::cluster {
   $config_includedir  = $::percona::config_includedir
   $config_user        = $::percona::config_user
   $config_group       = $::percona::config_group
-  $config_replace     = $::percona::config_replace
-  $config_skip        = $::percona::config_skip
 
   $daemon_user        = $::percona::daemon_user
   $logdir             = $::percona::logdir
