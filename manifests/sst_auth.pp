@@ -15,7 +15,7 @@ class percona::sst_auth {
     percona_grant {"${wsrep_sst_user}@localhost":
       mgmt_cnf      => $percona::mgmt_cnf,
       privileges    => ['reload_priv', 'lock_tables_priv', 'repl_client_priv' ],
-      require       => Mysql_User["${wsrep_sst_user}@localhost"],
+      require       => Percona_User["${wsrep_sst_user}@localhost"],
     }
   }
 }

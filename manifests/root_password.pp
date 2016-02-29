@@ -7,7 +7,7 @@ class percona::root_password {
 
 
   if $percona::root_password != 'UNSET' {
-    if !percona_check_file($percona::mgmt_cnf){
+    if !percona_check_file($percona::mgmt_cnf) and $percona::master {
       exec {'percona-root-password':
         onlyif    => [
           'test -f /usr/bin/mysqladmin',
