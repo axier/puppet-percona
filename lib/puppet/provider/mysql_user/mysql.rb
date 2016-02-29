@@ -7,6 +7,7 @@ Puppet::Type.type(:mysql_user).provide(:mysql) do
   optional_commands :mysql => 'mysql'
   optional_commands :mysqladmin => 'mysqladmin'
 
+
   def mysql_args(*args)
     if @resource[:mgmt_cnf].is_a?(String)
       args.insert(0, "--defaults-file=#{@resource[:mgmt_cnf]}")
@@ -47,8 +48,12 @@ Puppet::Type.type(:mysql_user).provide(:mysql) do
   end
 
   def password_hash=(string)
-    mysql(mysql_args("mysql", "-e", "SET PASSWORD FOR '%s' = '%s'" % [ @resource[:name].sub("@", "'@'"), string ]))
-    mysql_flush
+    if @resource[:name][0..3] == 'root'
+      mysql(mysql_args("mysql", "-e", "SET PASSWORD FOR '%s' = '%s'" % [ @resource[:name].sub("@", "'@'"), string ]))
+    else
+      mysql(mysql_args("mysql", "-e", "SET PASSWORD FOR '%s' = '%s'" % [ @resource[:name].sub("@", "'@'"), string ]))
+      mysql_flush
+    end
   end
 end
 

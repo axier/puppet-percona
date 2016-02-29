@@ -47,69 +47,70 @@
 # TODO: Document parameters
 #
 class percona::params (
-  $package_version   = '5.6',
-  $manage_repo       = true,
-  $package           = 'cluster',
+  $package_version                = '5.6',
+  $manage_repo                    = true,
+  $mode                           = 'cluster',
+  $master                         = false,
 
-  $config_dir_mode   = '0750',
-  $config_file_mode  = '0640',
-  $config_user       = 'root',
-  $config_group      = 'root',
+  $config_file_mode               = '0644',
+  $config_include_dir             = undef,
+  $config_include_dir_mode        = '0744',
+  $config_user                    = 'root',
+  $config_group                   = 'root',
+  $manage_config_file             = true,
 
-  $config_content    = undef,
+  $service_enable                 = true,
+  $service_ensure                 = 'running',
+  $service_name                   = 'mysql',
+  $service_restart                = true,
+  $daemon_group                   = 'mysql',
+  $daemon_user                    = 'mysql',
+  $pidfile                        = '/var/run/mysqld/mysqld.pid',
+  $basedir                        = '/usr',
+  $bind_address                   = $::fqdn,
+  $port                           = '3306',
+  $max_connections                = '512',
+  $mysql_user                     = 'mysql',
 
-  $config_template   = undef,
-  $config_skip       = false,
-  $config_replace    = true,
-  $config_include_dir = undef,
-  $config_file       = undef,
-  $manage_config_file = true,
+  $tmpdir                         = '/tmp',
+  $logdir                         = '/var/log/percona',
+  $logdir_group                   = 'root',
+  $socket                         = '/var/lib/mysql/mysql.sock',
+  $datadir                        = '/var/lib/mysql',
+  $targetdir                      = '/data/backups/mysql/',
+  $error_log                      = '/var/log/mysqld.log',
 
-  $service_enable    = true,
-  $service_ensure    = 'running',
-  $service_name      = 'mysql',
-  $service_restart   = true,
-  $daemon_group      = 'mysql',
-  $daemon_user       = 'mysql',
-  $pidfile           = '/var/run/mysqld/mysqld.pid',
-  $basedir           = '/usr',
+  $default_storage_engine         = 'InnoDB',
+  $binlog_format                  = 'ROW',
+  $wsrep_provider                 = '/usr/lib64/libgalera_smm.so',
+  $wsrep_cluster_name             = 'custerPercona',
+  $wsrep_sst_method               = 'rsync',
+  $wsrep_slave_threads            = 8,
 
-  $tmpdir            = '/tmp',
-  $logdir            = '/var/log/percona',
-  $logdir_group      = 'root',
-  $socket            = '/var/lib/mysql/mysql.sock',
-  $datadir           = '/var/lib/mysql',
-  $targetdir         = '/data/backups/mysql/',
-  $error_log         = '/var/log/mysqld.log',
+  $innodb_buffer_pool_size        = '1G',
+  $innodb_log_file_size           = '2047M',
+  $innodb_log_buffer_size         = '128M',
+  $innodb_file_per_table          = 1,
+  $innodb_autoinc_lock_mode       = 2,
+  $innodb_flush_log_at_trx_commit = 0,
+  $innodb_support_xa              = 0,
+  $innodb_doublewrite             = 0,
+  $innodb_flush_method            = O_DIRECT,
 
-  $mysql_cluster_servers = 'ipadresses',
-  $wsrep_cluster_address = "gcomm://${mysql_cluster_servers}",
-  $wsrep_provider = $percona::params::percona_provider,
-  $wsrep_sst_receive_address = "${ipaddress}:4020",
-  $wsrep_sst_user = 'sstuser',
-  $wsrep_sst_password = 'sStus3r4020',
-  $wsrep_sst_method = 'xtrabackup',
-  $wsrep_cluster_name = 'custerPercona',
-  $wsrep_sst_donor = undef,
+  $query_cache_size               = 0,
+  $query_cache_type               = 0,
+
+  $symbolic_links                 = 0,
+  $sync_binlog                    = 0,
+  $log_bin                        = '/var/lib/mysql/binlog',
+
+  $mgmt_cnf                       = '/etc/.my.cnf',
 
 
-  $pkg_client        = undef,
-  $pkg_server        = undef,
-  $pkg_common        = undef,
-  $pkg_compat        = undef,
-  $pkg_version       = undef,
-
-  $mgmt_cnf          = undef,
 
 ){
 
   case $::operatingsystem {
-    /(?i:debian|ubuntu)/: {
-      $config_dir                 = '/etc/mysql'
-      $default_config_file        = "${config_dir}/my.cnf"
-      $config_include_dir_default = "${config_dir}/conf.d"
-    }
-
     /(?i:redhat|centos)/: {
       $config_dir                 = '/etc'
       $default_config_file        = "${config_dir}/my.cnf"
@@ -119,57 +120,5 @@ class percona::params (
     default: {
       fail('Operating system not supported yet.')
     }
-  }
-
-  $default_config  = {
-    'mysqld' => {
-      #'basedir'                        => $percona::params::basedir,
-      'bind-address'                    => $::fqdn,
-      'datadir'                         => $percona::params::datadir,
-      #'expire_logs_days'               => '10',
-      #'key_buffer_size'                => '16M',
-      #'log-error'                      => $percona::params::error_log,
-      #'max_allowed_packet'             => '16M',
-      #'max_binlog_size'                => '100M',
-      #'max_connections'                => '151',
-      #'myisam_recover'                 => 'BACKUP',
-      #'pid-file'                       => $percona::params::pidfile,
-      #'port'                           => '3306',
-      #'query_cache_limit'              => '1M',
-      #'query_cache_size'               => '16M',
-      #'skip-external-locking'          => true,
-      #'socket'                         => $percona::params::socket,
-      #'ssl-disable'                    => false,
-      #'thread_cache_size'              => '8',
-      #'thread_stack'                   => '256K',
-      #'tmpdir'                         => $percona::params::tmpdir,
-      'user'                           => 'mysql',
-      'wsrep_provider'                 => '/usr/lib64/libgalera_smm.so',
-      'wsrep_cluster_address'          => "gcomm://centos7-1.vagrant.local,centos7-2.vagrant.local,centos7-3.vagrant.local",
-      'binlog_format'                  => 'ROW',
-      'default_storage_engine'         => 'InnoDB',
-      'wsrep_node_address'             => $::fqdn,
-      'wsrep_sst_method'               => 'xtrabackup',
-      'wsrep_sst_auth'                 => "sstuser:s3cret",
-      'wsrep_cluster_name'             => 'custerPercona',
-      'innodb_buffer_pool_size'        => '128M',
-      'innodb_log_file_size'           => '256M',
-      'innodb_file_per_table'          => '1',
-      'innodb_autoinc_lock_mode'       => '2',
-      'innodb_locks_unsafe_for_binlog' => '1',
-    },
-    'mysqld_safe' => {
-      'log-error'        => $percona::params::error_log,
-      'socket'           => $percona::params::socket,
-    },
-    'client' => {
-      'port'                  => '3306',
-      'socket'                => $percona::params::socket,
-    },
-  }
-
-  $_config_file = $config_file ? {
-    undef   => $default_config_file,
-    default => $config_file,
   }
 }

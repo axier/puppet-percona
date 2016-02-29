@@ -22,5 +22,11 @@ Puppet::Type.newtype(:mysql_database) do
     newvalue(/^\S+$/)
   end
 
+  newpropety(:collate) do
+    desc "The collate to use for a database"
+    defaultto :utf8_general_ci
+    newvalue(/^\S+$/)
+  end
+
 end
 

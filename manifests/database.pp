@@ -1,16 +1,3 @@
-# = Definition: percona::database
-#
-# A basic helper used to create a database.
-#
-# == Parameters:
-#
-# $ensure::   Defaults to present
-#
-# $charset::  Character set to use when creating the database.
-#
-# $mgmt_cnf:: Management config file to use while creating
-#             the database. Defaults to undefined.
-#
 define percona::database (
   $ensure   = 'present',
   $charset  = 'utf8',

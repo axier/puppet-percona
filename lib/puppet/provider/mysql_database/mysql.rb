@@ -38,6 +38,10 @@ Puppet::Type.type(:mysql_database).provide(:mysql) do
     mysql(mysql_args('-NBe', "alter database `#{resource[:name]}` CHARACTER SET #{value}"))
   end
 
+  def collate=(value)
+    mysql(mysql_args('-NBe', "alter database `#{resource[:name]}` COLLATE SET #{value}"))
+  end
+
   def exists?
     begin
       mysql(mysql_args('-NBe', "show databases")).match(/^#{@resource[:name]}$/)

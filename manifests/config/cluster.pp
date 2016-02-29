@@ -1,8 +1,5 @@
 class percona::config::cluster {
 
-  $config_content     = $::percona::config_content
-  $config_dir         = $::percona::config_dir
-  $config_dir_mode    = $::percona::config_dir_mode
   $config_file        = $::percona::config_file
   $config_file_mode   = $::percona::config_file_mode
   $purge_includedir   = $::percona::purge_includedir
@@ -20,41 +17,69 @@ class percona::config::cluster {
   $template           = $::percona::template
   $version            = $::percona::percona_version
 
-  $default_config     = $::percona::params::default_config
-  $override_config    = $::percona::override_config
+  $default_config     = $::percona::default_config
+  $custom_config      = $::percona::custom_config
   $manage_config_file = $::percona::manage_config_file
 
+  $wsrep_sst_method   = $percona::wsrep_sst_method
+  $wsrep_sst_user     = $percona::wsrep_sst_user
+  $wsrep_sst_password = $percona::wsrep_sst_password
 
-  $options = merge($default_config, $override_config)
+
+  case $wsrep_sst_method {
+    'mysqldump': {
+      $sst_method_config = {
+        'mysqld' => {
+          'wsrep_sst_method' => 'mysqldump',
+        },
+      }
+    }
+    'xtrabackup-v2': {
+      $sst_method_config = {
+        'mysqld' => {
+          'wsrep_sst_method' => 'xtrabackup-v2',
+          'wsrep_sst_auth'   => "${wsrep_sst_user}:${wsrep_sst_password}"
+        },
+      }
+    }
+    default: {
+      $sst_method_config = {
+        'mysqld' => {
+          'wsrep_sst_method' => 'rsync',
+        },
+      }
+    }
+  }
+
+  $options = percona_hash_merge($default_config, $sst_method_config, $custom_config)
 
   File {
     owner   => $config_user,
     group   => $config_group,
-    mode    => $config_dir_mode,
     require => [
       Class['percona::install'],
     ],
   }
-  /*if $service_restart {
-    File {
-      notify => Service[$service_name],
-    }
-  }*/
 
   if $config_includedir and $config_includedir != '' {
     file { $config_includedir:
       ensure  => directory,
       recurse => $purge_includedir,
       purge   => $purge_includedir,
+      mode    => $::percona::config_include_dir_mode,
     }
   }
 
   if $::percona::manage_config_file {
-    file { $_config_file:
-      path                    => $::percona::params::_config_file,
+    file { $config_file:
+      path                    => $config_file,
       ensure                  => 'present',
-      content                 => template("percona/${::percona::package}/my.cnf.erb"),
+      content                 => template("percona/${::percona::mode}/my.cnf.erb"),
+      mode                    => $::percona::config_file_mode,
       selinux_ignore_defaults => true,
+      notify => [
+        Class['percona::service'],
+      ],
     }
   }
 }

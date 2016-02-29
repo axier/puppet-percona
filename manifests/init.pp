@@ -1,133 +1,132 @@
-# == Class: percona
-#
-# This class installs percona
-#
-# === Parameters:
-#
-# For a complete overview of the parameters you can use, take a look at
-# percona::params. Parameters documented here can not be set globally.
-#
-# === Parameter Extras:
-#
-# For certain options, using '.' (dots) is not allowed. For this
-# you can use $::percona::sanitized_servername. ('.' are replaced by '-')
-#
-#
-# === Actions:
-#  - Install PerconaDB
-#
-# === Requires:
-#
-# * Debian only:
-#   - source: https://github.com/camptocamp/puppet-apt
-#
-# === Sample Usage:
-#
-# ==== This is the nodes.pp for the percona class
-#
-#     node hostname{
-#
-#       # This is generic mysql stuff
-#
-#       class {
-#         'apt':;   # debian only
-#         'percona':
-#           server          => true,
-#           percona_version => '5.1',
-#       }
-#
-#
-#       ## Creation of databases
-#       percona::database{'<databasename>':
-#         ensure => present
-#       }
-#
-#       ## This must be run on the master
-#       percona::rights {'Set rights for replication':
-#         user     => 'repl',
-#         password => 'repl',
-#         priv     => ['Repl_slave_priv'],
-#         host     => '$hostname',
-#       }
-#
-#
-#   THIS IS CURRENTLY NOT IMPLEMENTED!!!
-#   #
-#   #    ## This must be run on the slave nodes:
-#   #    percona::slave { "whatever":
-#   #      masterhost        => "hostip",
-#   #      masterlog         => "masterlog",
-#   #      masteruser        => "Replication user",
-#   #      masterpassword    => "Repication password",
-#   #      masterlogposition => "Masterlogposition",
-#   #    }
-#   #  }
-#
 class percona (
-  $percona_version  = $percona::params::percona_version,
-  $manage_repo      = $percona::params::manage_repo,
-  $package          = $percona::params::package,
+  $percona_version                = $percona::params::percona_version,
+  $manage_repo                    = $percona::params::manage_repo,
+  $mode                           = $percona::params::mode,
+  $master                         = $percona::params::master,
 
-  $config_dir_mode  = $percona::params::config_dir_mode,
-  $config_file_mode = $percona::params::config_file_mode,
-  $config_user      = $percona::params::config_user,
-  $config_group     = $percona::params::config_group,
+  $config_file                    = $percona::params::default_config_file,
+  $config_file_mode               = $percona::params::config_file_mode,
+  $config_dir                     = $percona::params::config_dir,
+  $config_dir_mode                = $percona::params::config_dir_mode,
+  $config_include_dir             = $percona::params::config_include_dir,
+  $config_include_dir_mode        = $percona::params::config_include_dir_mode,
+  $config_user                    = $percona::params::config_user,
+  $config_group                   = $percona::params::config_group,
+  $manage_config_file             = $percona::params::manage_config_file,
 
-  $config_content     = $percona::params::config_content,
-  $config_template    = $percona::params::config_template,
-  $config_skip        = $percona::params::config_skip,
-  $config_replace     = $percona::params::config_replace,
-  $config_include_dir = $percona::params::config_include_dir,
-  $manage_config_file = $percona::params::manage_config_file,
+  $service_enable                 = $percona::params::service_enable,
+  $service_ensure                 = $percona::params::service_ensure,
+  $service_restart                = $percona::params::service_restart,
+  $daemon_group                   = $percona::params::daemon_group,
+  $daemon_user                    = $percona::params::daemon_user,
+  $pidfile                        = $percona::params::pidfile,
+  $bind_address                   = $percona::params::bind_address,
+  $port                           = $percona::params::port,
+  $max_connections                = $percona::params::max_connections,
 
-  $service_enable   = $percona::params::service_enable,
-  $service_ensure   = $percona::params::service_ensure,
-  $service_name     = $percona::params::service_name,
-  $service_restart  = $percona::params::service_restart,
-  $daemon_group     = $percona::params::daemon_group,
-  $daemon_user      = $percona::params::daemon_user,
-  $pidfile          = $percona::params::pidfile,
+  $tmpdir                         = $percona::params::tmpdir,
+  $logdir                         = $percona::params::logdir,
+  $logdir_group                   = $percona::params::logdir_group,
+  $socket                         = $percona::params::socket,
+  $datadir                        = $percona::params::datadir,
+  $errorlog                       = $percona::params::errorlog,
 
-  $tmpdir           = $percona::params::tmpdir,
-  $logdir           = $percona::params::logdir,
-  $logdir_group     = $percona::params::logdir_group,
-  $socket           = $percona::params::socket,
-  $datadir          = $percona::params::datadir,
-  $targetdir        = $percona::params::targetdir,
-  $errorlog         = $percona::params::errorlog,
+  $root_password                  = undef,
+  $mgmt_cnf                       = $percona::params::mgmt_cnf,
+  $users                   = {},
+  $grants                  = {},
+  $databases               = {},
 
+  $mysql_user                     = $percona::params::mysql_user,
+  $mysql_cluster_servers          = undef,
 
-  $pkg_client       = $percona::params::pkg_client,
-  $pkg_common       = $percona::params::pkg_common,
-  $pkg_server       = $percona::params::pkg_server,
-  $pkg_compat       = $percona::params::pkg_compat,
-  $pkg_version      = $percona::params::pkg_version,
+  $storage_engine                 = $percona::params::default_storage_engine,
+  $binlog_format                  = $percona::params::binlog_format,
+  $wsrep_provider                 = $percona::params::wsrep_provider,
+  $wsrep_cluster_name             = $percona::params::wsrep_cluster_name,
+  $wsrep_sst_method               = $percona::params::wsrep_sst_method,
+  $wsrep_slave_threads            = $percona::params::wsrep_slave_threads,
+  $wsrep_sst_user                 = undef,
+  $wsrep_sst_password             = undef,
 
-  $mgmt_cnf         = $percona::params::mgmt_cnf,
+  $innodb_buffer_pool_size        = $percona::params::innodb_buffer_pool_size,
+  $innodb_log_file_size           = $percona::params::innodb_log_file_size,
+  $innodb_log_buffer_size         = $percona::params::innodb_log_buffer_size,
+  $innodb_file_per_table          = $percona::params::innodb_file_per_table,
+  $innodb_autoinc_lock_mode       = $percona::params::innodb_autoinc_lock_mode,
+  $innodb_flush_log_at_trx_commit = $percona::params::innodb_flush_log_at_trx_commit,
+  $innodb_support_xa              = $percona::params::innodb_support_xa,
+  $innodb_doublewrite             = $percona::params::innodb_doublewrite,
+  $innodb_flush_method            = $percona::params::innodb_flush_method,
 
-  ## These options can NOT be defaulted in percona::params.
-  # They are specific for this server instance.
-  $servername       = $::fqdn,
+  $query_cache_size               = $percona::params::query_cache_size,
+  $query_cache_type               = $percona::params::query_cache_type,
 
-  ## These settings are defaulted distro specific ##
-  $template         = $percona::params::template,
-  $config_dir       = $percona::params::config_dir,
-  $config_file      = $percona::params::_config_file,
+  $symbolic_links                 = $percona::params::symbolic_links,
+  $sync_binlog                    = $percona::params::sync_binlog,
+  $log_bin                        = $percona::params::log_bin,
 
 ) inherits percona::params {
 
-  $config_include_dir_default = $::percona::params::config_include_dir_default
-  $config_includedir = $config_include_dir ? {
-    undef   => $config_include_dir_default,
-    default => $config_include_dir,
-  }
+  validate_string($mysql_cluster_servers)
 
   $sanitized_servername = regsubst($::percona::servername,'\.','-','G')
 
-  case $package {
 
+
+
+  case $mode {
     'cluster': {
       $package_prefix = 'XtraDB-Cluster'
+      $default_config  = {
+        'mysqld' => {
+          'basedir'                        => $basedir,
+          'bind-address'                   => $bind_address,
+          'datadir'                        => $datadir,
+          'max_connections'                => $max_connections,
+          'pid-file'                       => $pidfile,
+          'port'                           => $port,
+          'socket'                         => $socket,
+          'tmpdir'                         => $tmpdir,
+          'user'                           => $mysql_user,
+          'wsrep_provider'                 => $wsrep_provider,
+          'wsrep_cluster_address'          => "gcomm://${mysql_cluster_servers}",
+          'binlog_format'                  => $binlog_format,
+          'default_storage_engine'         => $storage_engine,
+          'wsrep_node_address'             => $::fqdn,
+          'wsrep_sst_method'               => $wsrep_sst_method,
+          'wsrep_cluster_name'             => $wsrep_cluster_name,
+          'wsrep_slave_threads'            => $wsrep_slave_threads,
+          'innodb_buffer_pool_size'        => $percona::params::innodb_buffer_pool_size,
+          'innodb_log_file_size'           => $percona::params::innodb_log_file_size,
+          'innodb_log_buffer_size'         => $percona::params::innodb_log_buffer_size,
+          'innodb_file_per_table'          => $innodb_file_per_table,
+          'innodb_autoinc_lock_mode'       => $innodb_autoinc_lock_mode,
+          'innodb_flush_log_at_trx_commit' => $innodb_flush_log_at_trx_commit,
+          'innodb_support_xa'              => $innodb_support_xa,
+          'innodb_doublewrite'             => $innodb_doublewrite,
+          'innodb_flush_method'            => $innodb_flush_method,
+          'query_cache_size'               => $query_cache_size,
+          'query_cache_type'               => $query_cache_type,
+          'sync_binlog'                    => $sync_binlog,
+          'log-bin'                        => $log_bin,
+          'symbolic_links'                 => $symbolic_links,
+        },
+        'mysqld_safe' => {
+          'log-error' => $error_log,
+          'socket'    => $socket,
+        },
+        'client' => {
+          'port'   => $port,
+          'socket' => $socket,
+        },
+      }
+       if $master {
+         $service_name = 'mysql@bootstrap'
+      } else
+      {
+         $service_name = $percona::params::service_name
+      }
     }
     'server': {
       $package_prefix = 'Server-server'
@@ -143,21 +142,21 @@ class percona (
     }
   }
 
-
-
-
-  ## Translate settings in params in a hash.
-  $override_config = {}
-
   include percona::preinstall
   include percona::install
   include percona::config
-  #include percona::service
+  include percona::service
+  include percona::root_password
+  include percona::sst_auth
 
+  anchor{'percona::start': } ->
   Class['percona::preinstall'] ->
   Class['percona::install'] ->
-  Class['percona::config']
-  #Class['percona::service']
+  Class['percona::config'] ->
+  Class['percona::service'] ->
+  Class['percona::root_password'] ->
+  Class['percona::sst_auth'] ->
+  anchor{'percona::end': }
 
 }
 

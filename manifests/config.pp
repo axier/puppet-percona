@@ -3,9 +3,9 @@
 #
 class percona::config {
 
-  $package = $::percona::package
+  $mode = $::percona::mode
 
-  case $package {
+  case $mode {
     'cluster': {
       include percona::config::cluster
     }
@@ -19,7 +19,7 @@ class percona::config {
       include percona::config::server_client
     }
     default: {
-        fail('Wrong package!!! Wou must choose one of the follow packages: cluster, server, cluster_client, cluster_server.')
+        fail('Wrong mode!!! Wou must choose one of the follow packages: cluster, server, cluster_client, cluster_server.')
     }
   }
 }
