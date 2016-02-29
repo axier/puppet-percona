@@ -22,7 +22,7 @@ Puppet::Type.newtype(:percona_database) do
     newvalue(/^\S+$/)
   end
 
-  newpropety(:collate) do
+  newproperty(:collate) do
     desc "The collate to use for a database"
     defaultto :utf8_general_ci
     newvalue(/^\S+$/)
