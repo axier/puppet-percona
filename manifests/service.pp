@@ -9,7 +9,7 @@ class percona::service {
   $mode           = $percona::mode
   $master         = $percona::master
 
-  if $master {
+  if $master and $mode == 'cluster' {
     service { $service_name:
       ensure  => $service_ensure,
       alias   => 'mysql',
