@@ -18,7 +18,6 @@ class percona::root_password {
         command   => "mysqladmin -h ${host} -u${user} password ${password}",
         before    => File[$percona::mgmt_cnf],
       }
-      notify { 'no': }
 
     } else {
       mysql_user { "${user}@${host}":
@@ -27,7 +26,6 @@ class percona::root_password {
         mgmt_cnf      => $percona::mgmt_cnf,
         before        => File[$percona::mgmt_cnf],
       }
-      notify { 'yes': }
     }
     file { $percona::mgmt_cnf:
       owner   => $percona::config_user,

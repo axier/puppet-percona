@@ -1,4 +1,4 @@
-Puppet::Type.newtype(:mysql_user) do
+Puppet::Type.newtype(:percona_user) do
   @doc = "Manage a database user."
 
   ensurable

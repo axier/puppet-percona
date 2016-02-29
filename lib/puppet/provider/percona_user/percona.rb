@@ -1,4 +1,4 @@
-Puppet::Type.type(:mysql_user).provide(:mysql) do
+Puppet::Type.type(:percona_user).provide(:mysql) do
 
   desc "Use mysql as database."
 
