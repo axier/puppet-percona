@@ -147,7 +147,6 @@ class percona (
   include percona::config
   include percona::service
   include percona::root_password
-  include percona::sst_auth
 
   anchor{'percona::start': } ->
   Class['percona::preinstall'] ->
@@ -155,7 +154,6 @@ class percona (
   Class['percona::config'] ->
   Class['percona::service'] ->
   Class['percona::root_password'] ->
-  Class['percona::sst_auth'] ->
   anchor{'percona::end': }
 
 }

@@ -1,8 +1,8 @@
-Puppet::Type.newtype(:mysql_grant) do
+Puppet::Type.newtype(:percona_grant) do
   @doc = "Manage a database user's rights."
   #ensurable
 
-  autorequire :mysql_database do
+  autorequire :percona_database do
     reqs = []
     matches = self[:name].match(/^([^@]+)@([^\/]+)\/(.+)$/)
     unless matches.nil?
@@ -11,7 +11,7 @@ Puppet::Type.newtype(:mysql_grant) do
     reqs
   end
 
-  autorequire :mysql_user do
+  autorequire :percona_user do
     reqs = []
     matches = self[:name].match(/^([^@]+)@([^\/]+).*$/)
     unless matches.nil?

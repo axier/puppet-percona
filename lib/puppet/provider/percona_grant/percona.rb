@@ -1,4 +1,4 @@
-Puppet::Type.type(:mysql_grant).provide(:mysql) do
+Puppet::Type.type(:percona_grant).provide(:percona) do
 
   desc "Uses mysql as database."
 

@@ -20,7 +20,7 @@ class percona::root_password {
       }
 
     } else {
-      mysql_user { "${user}@${host}":
+      percona_user { "${user}@${host}":
         ensure        => present,
         password_hash => mysql_password($percona::root_password),
         mgmt_cnf      => $percona::mgmt_cnf,

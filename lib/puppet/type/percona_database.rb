@@ -1,5 +1,5 @@
 # This has to be a separate type to enable collecting
-Puppet::Type.newtype(:mysql_database) do
+Puppet::Type.newtype(:percona_database) do
   @doc = "Manage a database."
 
   ensurable
