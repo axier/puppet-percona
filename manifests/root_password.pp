@@ -40,6 +40,7 @@ case $mode {
     default: {
       # Client doesn't require.
     }
+  }
 
   file { $percona::mgmt_cnf:
     owner   => $percona::config_user,
