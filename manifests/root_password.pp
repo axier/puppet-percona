@@ -6,8 +6,8 @@ class percona::root_password {
 
 
 
-  if $percona::root_password != 'UNSET' {
-    if !percona_check_file($percona::mgmt_cnf) and $percona::master {
+  if $percona::root_password != 'UNSET' and $percona::master {
+    if !percona_check_file($percona::mgmt_cnf) {
       exec {'percona-root-password':
         onlyif    => [
           'test -f /usr/bin/mysqladmin',
@@ -27,11 +27,11 @@ class percona::root_password {
         before        => File[$percona::mgmt_cnf],
       }
     }
-    file { $percona::mgmt_cnf:
-      owner   => $percona::config_user,
-      group   => $percona::config_group,
-      mode    => '0600',
-      content => template("${module_name}/mgmt_cnf.erb"),
-    }
+  }
+  file { $percona::mgmt_cnf:
+    owner   => $percona::config_user,
+    group   => $percona::config_group,
+    mode    => '0600',
+    content => template("${module_name}/mgmt_cnf.erb"),
   }
 }
